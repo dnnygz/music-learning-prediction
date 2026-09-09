@@ -1,0 +1,4 @@
+.matplotlib_cache/
+.venv
+*.csv
+*.json
