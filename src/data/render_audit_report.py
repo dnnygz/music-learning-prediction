@@ -22,7 +22,8 @@ def main() -> None:
     args = parse_args()
     events = json.loads(args.events_audit.read_text(encoding="utf-8"))
     coverage = json.loads(args.coverage_audit.read_text(encoding="utf-8"))
-    duplicate_rate = 100 * events["exact_duplicate_rate"]
+    duplicate_rate = 100 * events["duplicate_composite_key_rate"]
+    exact_duplicate_rate = 100 * events["exact_duplicate_rate"]
     zero_rate = 100 * events["zero_total_evaluated_rows"] / events["rows"]
     observable_rate = 100 * coverage["future_observable_students"] / coverage["students"]
 
@@ -44,14 +45,16 @@ exceed their evaluated denominators.
 
 ## Findings
 
-### Duplicate event records — medium severity
+### Potential duplicate event records — medium severity
 
-- {events['exact_duplicate_rows']:,} later occurrences are exact duplicates
-  ({duplicate_rate:.2f}% of all rows).
+- {events['duplicate_composite_keys']:,} later occurrences match on the flat
+  tabular fields ({duplicate_rate:.2f}% of all rows).
+- {events['exact_duplicate_rows']:,} also match on nested `events_data`
+  ({exact_duplicate_rate:.2f}% of all rows).
 - {events['students_affected_by_duplicate_keys']:,} students have at least one
   duplicated composite event key.
-- Duplicates are retained in `events_clean.parquet` until the source semantics
-  establish whether they are ingestion duplicates or valid repeated attempts.
+- All potential duplicates are retained until source semantics establish
+  whether exact raw matches are ingestion duplicates or valid repeated events.
 
 ### Undefined event accuracy — low severity
 
@@ -73,6 +76,8 @@ exceed their evaluated denominators.
 - Students with any future activity: {coverage['future_active_students']:,}.
 - Future observable students under the current configurable thresholds:
   {coverage['future_observable_students']:,} ({observable_rate:.1f}%).
+- Students meeting both initial eligibility and future observability:
+  {coverage['analysis_cohort_students']:,}.
 - Thresholds: {coverage['observability_thresholds']}.
 - Initial eligibility reasons: {coverage['initial_eligibility_reasons']}.
 - Future observability reasons: {coverage['future_observability_reasons']}.

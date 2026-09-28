@@ -31,6 +31,7 @@ def raw_event(user_id: str, day: float, evaluated: int = 10) -> dict[str, object
             "is_played_in_full": "true",
             "exit_status": "completed",
             "exercise_part_index": 0,
+            "events_data": '{"data":{"timing_offset":[-4],"pitch_offset":[0]}}',
         }
     )
     return row
@@ -47,6 +48,7 @@ class DataPipelineTests(unittest.TestCase):
         self.assertEqual(events.loc[0, "total_evaluated"], 10)
         self.assertAlmostEqual(events.loc[0, "success_rate_total"], 0.9)
         self.assertTrue(pd.isna(events.loc[1, "success_rate_total"]))
+        self.assertEqual(len(events.loc[0, "events_data_hash"]), 64)
         self.assertEqual(audit_events(events)["checks"]["negative_counts"], 0)
 
     def test_coverage_keeps_students_without_future_activity(self) -> None:

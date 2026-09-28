@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -40,21 +41,38 @@ def _abandoned(value: Any) -> bool:
 def load_raw_events(path: Path) -> pd.DataFrame:
     """Read the raw array while discarding the nested event payload."""
     records = []
-    for raw in stream_json_array(path):
-        records.append({column: raw.get(column) for column in RAW_COLUMNS})
-    return pd.DataFrame.from_records(records, columns=RAW_COLUMNS)
+    for source_row_number, raw in enumerate(stream_json_array(path)):
+        record = {column: raw.get(column) for column in RAW_COLUMNS}
+        record["source_row_number"] = source_row_number
+        records.append(record)
+    return pd.DataFrame.from_records(records, columns=(*RAW_COLUMNS, "source_row_number"))
 
 
 def clean_events(raw: pd.DataFrame) -> pd.DataFrame:
     """Normalize types and add transparent derived event measures."""
     events = raw.copy()
 
+    if "source_row_number" not in events:
+        events["source_row_number"] = range(len(events))
+
     for column in STRING_COLUMNS:
         events[column] = events[column].astype("string").str.strip()
         events.loc[events[column] == "", column] = pd.NA
 
+    events["events_data"] = events["events_data"].astype("string")
+    events["events_data_hash"] = events["events_data"].map(
+        lambda value: hashlib.sha256(value.encode("utf-8")).hexdigest()
+        if pd.notna(value)
+        else pd.NA,
+        na_action=None,
+    ).astype("string")
+
     for column in NUMERIC_COLUMNS:
         events[column] = pd.to_numeric(events[column], errors="coerce")
+
+    events["source_row_number"] = pd.to_numeric(
+        events["source_row_number"], errors="raise"
+    ).astype("int64")
 
     for column in COUNT_COLUMNS:
         events[column] = events[column].astype("Int64")
@@ -98,8 +116,10 @@ def audit_events(events: pd.DataFrame) -> dict[str, Any]:
     ]
     students_per_exercise = events.groupby("exercise_id", observed=True)["user_id"].nunique()
     events_per_exercise = events.groupby("exercise_id", observed=True).size()
+    raw_content_key = [*duplicate_key, "events_data_hash"]
     duplicate_mask = events.duplicated(subset=duplicate_key, keep=False)
-    exact_duplicate_count = int(events.duplicated().sum())
+    raw_duplicate_mask = events.duplicated(subset=raw_content_key, keep=False)
+    exact_duplicate_count = int(events.duplicated(subset=raw_content_key).sum())
     composite_duplicate_count = int(events.duplicated(subset=duplicate_key).sum())
 
     checks = {
@@ -129,6 +149,9 @@ def audit_events(events: pd.DataFrame) -> dict[str, Any]:
         "duplicate_composite_key_rate": composite_duplicate_count / len(events),
         "students_affected_by_duplicate_keys": int(
             events.loc[duplicate_mask, "user_id"].nunique()
+        ),
+        "students_affected_by_exact_raw_duplicates": int(
+            events.loc[raw_duplicate_mask, "user_id"].nunique()
         ),
         "zero_total_evaluated_rows": int((events["total_evaluated"] == 0).sum()),
         "checks": checks,

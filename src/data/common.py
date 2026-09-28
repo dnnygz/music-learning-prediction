@@ -30,6 +30,7 @@ RAW_COLUMNS = (
     "is_played_in_full",
     "exit_status",
     "exercise_part_index",
+    "events_data",
 )
 
 

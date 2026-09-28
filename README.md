@@ -134,6 +134,7 @@ Generar y auditar la capa de datos:
 python -m src.data.clean_events
 python -m src.data.build_student_tables
 python -m src.data.render_audit_report
+python -m src.data.audit_semantics
 ```
 
 Los umbrales de observabilidad son argumentos explícitos. Por ejemplo:
@@ -150,12 +151,5 @@ Artefactos generados:
 - `data/interim/student_coverage.parquet`
 - `data/interim/events_audit.json`
 - `data/interim/student_coverage_audit.json`
-- `reports/data_quality_report.md`
-
-## Limitaciones identificadas
-
-- El dataset original contiene múltiples registros por usuario.
-- Algunas filas pueden aparecer duplicadas o representar reintentos dentro de una sesión.
-- Algunas métricas de precisión no pueden calcularse cuando el denominador es cero.
-- Las variables de identificación de canciones y ejercicios no deben usarse directamente como predictores.
-- La variable objetivo debe construirse con ventanas temporales separadas para evitar fuga de información.
+- `reports/semantics_audit.md`
+- `data/interim/threshold_sensitivity.parquet`

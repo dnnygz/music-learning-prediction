@@ -118,6 +118,9 @@ def coverage_audit(
         "initial_eligible_students": int(coverage["initial_eligible"].sum()),
         "future_active_students": int(coverage["future_active"].sum()),
         "future_observable_students": int(coverage["future_observable"].sum()),
+        "analysis_cohort_students": int(
+            (coverage["initial_eligible"] & coverage["future_observable"]).sum()
+        ),
         "initial_eligibility_reasons": {
             str(key): int(value) for key, value in initial_reasons.items()
         },
