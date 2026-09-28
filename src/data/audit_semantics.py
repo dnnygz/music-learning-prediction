@@ -87,7 +87,7 @@ def audit_duplicates(events: pd.DataFrame) -> dict[str, Any]:
         },
         "adjacent_or_nearby_groups_source_span_le_5": int((source_spans <= 5).sum()),
         "groups_source_span_over_100": int((source_spans > 100).sum()),
-        "affected_users": int(duplicate_rows["user_id"].nunique()),
+        "users_affected_by_tabular_matches": int(duplicate_rows["user_id"].nunique()),
         "top_10_users_by_duplicate_group_rows": {
             str(user): int(count) for user, count in duplicate_by_user.head(10).items()
         },
@@ -109,7 +109,7 @@ def sensitivity_table(events: pd.DataFrame) -> pd.DataFrame:
                         events,
                         min_initial_active_days=initial_days,
                         min_initial_evaluated=initial_evaluated,
-                        min_future_active_days=future_days,
+                        min_future_evaluated_days=future_days,
                         min_future_evaluated=future_evaluated,
                     )
                     initial_eligible = coverage["initial_eligible"]
@@ -118,7 +118,7 @@ def sensitivity_table(events: pd.DataFrame) -> pd.DataFrame:
                         {
                             "min_initial_active_days": initial_days,
                             "min_initial_evaluated": initial_evaluated,
-                            "min_future_active_days": future_days,
+                            "min_future_evaluated_days": future_days,
                             "min_future_evaluated": future_evaluated,
                             "initial_eligible": int(initial_eligible.sum()),
                             "future_observable_all_users": int(future_observable.sum()),
@@ -173,22 +173,25 @@ def render_report(
     selected = sensitivity[
         (sensitivity["min_initial_active_days"] == 1)
         & (sensitivity["min_initial_evaluated"] == 1)
-        & sensitivity["min_future_active_days"].isin([1, 2, 3, 5, 7])
+        & sensitivity["min_future_evaluated_days"].isin([1, 2, 3, 5, 7])
         & sensitivity["min_future_evaluated"].isin([50, 100, 200, 500])
     ]
     pivot = selected.pivot(
-        index="min_future_active_days",
+        index="min_future_evaluated_days",
         columns="min_future_evaluated",
         values="analysis_cohort",
     )
-    table_lines = ["| Future active days | 50 | 100 | 200 | 500 |", "|---:|---:|---:|---:|---:|"]
+    table_lines = [
+        "| Future evaluated active days ↓ / Evaluated elements → | 50 elements | 100 elements | 200 elements | 500 elements |",
+        "| ------------------------------------------------------ | ----------: | -----------: | -----------: | -----------: |",
+    ]
     for active_days, values in pivot.iterrows():
         table_lines.append(
-            f"| {active_days} | {values[50]} | {values[100]} | {values[200]} | {values[500]} |"
+            f"| {active_days} {'day' if active_days == 1 else 'days'} | {values[50]} | {values[100]} | {values[200]} | {values[500]} |"
         )
 
     selected_initial = sensitivity[
-        (sensitivity["min_future_active_days"] == 3)
+        (sensitivity["min_future_evaluated_days"] == 3)
         & (sensitivity["min_future_evaluated"] == 100)
     ]
     initial_pivot = selected_initial.pivot(
@@ -197,12 +200,12 @@ def render_report(
         values="analysis_cohort",
     )
     initial_table_lines = [
-        "| Initial active days | 1 | 50 | 100 | 500 |",
-        "|---:|---:|---:|---:|---:|",
+        "| Initial active days ↓ / Evaluated elements → | 1 element | 50 elements | 100 elements | 500 elements |",
+        "| ------------------------------------------------ | --------: | ----------: | -----------: | -----------: |",
     ]
     for active_days, values in initial_pivot.iterrows():
         initial_table_lines.append(
-            f"| {active_days} | {values[1]} | {values[50]} | {values[100]} | {values[500]} |"
+            f"| {active_days} {'day' if active_days == 1 else 'days'} | {values[1]} | {values[50]} | {values[100]} | {values[500]} |"
         )
 
     cross = exclusions["initial_future_cross_tab"]
@@ -216,6 +219,11 @@ def render_report(
 - Eligible initially but not observable later: {cross['initial_eligible_not_future_observable']}.
 - Not initially eligible but observable later: {cross['not_initial_eligible_but_future_observable']}.
 - Neither: {cross['neither']}.
+
+Reconciliation note: an earlier audit produced a historical preliminary count
+of 881 because it counted any future active day. The corrected analysis cohort
+is 880: one student has three future activity days but only two days containing
+evaluable performance.
 
 The students without initial eligibility have no events in `[0, 7)`. Their
 first observed day ranges from
@@ -240,7 +248,8 @@ timing limitation, not missing success denominators in the initial window.
   {duplicates['users_affected_by_exact_raw_duplicates']}.
 - Share of all evaluated elements carried by later exact raw duplicates:
   {100 * duplicates['share_of_evaluated_elements_in_later_exact_raw_duplicates']:.3f}%.
-- Affected students: {duplicates['affected_users']}.
+- Users affected by any tabular match when `events_data` is ignored:
+  {duplicates['users_affected_by_tabular_matches']}.
 - Group sizes: {duplicates['group_size_distribution']}.
 - Groups located within five source rows: {duplicates['adjacent_or_nearby_groups_source_span_le_5']}.
 - Groups separated by more than 100 source rows: {duplicates['groups_source_span_over_100']}.
@@ -257,9 +266,13 @@ matches with different outcomes are treated as repeated attempts.
 The table reports the final analysis cohort among initially eligible students
 under initial thresholds of one active day and one evaluated element.
 
+Each cell is the number of students who meet or exceed both the row's day count
+and the column's evaluated-element count. Future days count only days containing
+at least one evaluated note or chord.
+
 {chr(10).join(table_lines)}
 
-Holding the future threshold at three active days and 100 evaluated elements,
+Holding the future threshold at three evaluated days and 100 evaluated elements,
 initial-threshold sensitivity is:
 
 {chr(10).join(initial_table_lines)}

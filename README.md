@@ -141,15 +141,6 @@ Los umbrales de observabilidad son argumentos explícitos. Por ejemplo:
 
 ```bash
 python -m src.data.build_student_tables \
-  --min-future-active-days 3 \
+  --min-future-evaluated-days 3 \
   --min-future-evaluated 100
 ```
-
-Artefactos generados:
-
-- `data/interim/events_clean.parquet`
-- `data/interim/student_coverage.parquet`
-- `data/interim/events_audit.json`
-- `data/interim/student_coverage_audit.json`
-- `reports/semantics_audit.md`
-- `data/interim/threshold_sensitivity.parquet`

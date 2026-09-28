@@ -67,7 +67,7 @@ class DataPipelineTests(unittest.TestCase):
             events,
             min_initial_active_days=1,
             min_initial_evaluated=1,
-            min_future_active_days=3,
+            min_future_evaluated_days=3,
             min_future_evaluated=20,
         ).set_index("user_id")
 
@@ -84,7 +84,7 @@ class DataPipelineTests(unittest.TestCase):
             clean_events(raw),
             min_initial_active_days=1,
             min_initial_evaluated=1,
-            min_future_active_days=1,
+            min_future_evaluated_days=1,
             min_future_evaluated=1,
         ).iloc[0]
 

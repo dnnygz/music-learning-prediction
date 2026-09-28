@@ -147,7 +147,7 @@ def audit_events(events: pd.DataFrame) -> dict[str, Any]:
         "exact_duplicate_rate": exact_duplicate_count / len(events),
         "duplicate_composite_keys": composite_duplicate_count,
         "duplicate_composite_key_rate": composite_duplicate_count / len(events),
-        "students_affected_by_duplicate_keys": int(
+        "students_affected_by_tabular_matches": int(
             events.loc[duplicate_mask, "user_id"].nunique()
         ),
         "students_affected_by_exact_raw_duplicates": int(

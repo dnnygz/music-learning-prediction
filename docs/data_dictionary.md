@@ -11,8 +11,9 @@
 
 ## `events_clean.parquet`
 
-Grain: one raw platform interaction. Exact semantic duplicates are currently
-retained while their source meaning is investigated.
+Grain: one raw platform interaction. Exact raw duplicates, including identical
+nested `events_data`, are currently retained while their source meaning is
+investigated.
 
 | Column | Type | Definition |
 |---|---|---|
@@ -52,6 +53,7 @@ Grain: exactly one row per student appearing in the raw JSON.
 | `initial_*` | Counts calculated from events in `[0, 7)`. |
 | `future_*` | Counts calculated from events in `[7, 31)`. |
 | `*_days_active` | Distinct integer day indices with events. |
+| `*_days_evaluated` | Distinct integer day indices with at least one evaluated note or chord. |
 | `*_sessions` | Distinct source session indices. |
 | `*_events` | Number of event rows, including unresolved exact duplicates. |
 | `*_notes_evaluated` | Sum of evaluated notes. |
@@ -61,12 +63,12 @@ Grain: exactly one row per student appearing in the raw JSON.
 | `reason_not_initial_eligible` | Mutually exclusive eligibility reason. |
 | `future_active` | Has at least one future event. |
 | `future_has_evaluations` | Has at least one future evaluated note or chord. |
-| `future_observable` | Meets configurable future-day and evaluated-count thresholds. |
+| `future_observable` | Meets configurable future evaluated-day and evaluated-count thresholds. |
 | `reason_not_observable` | Mutually exclusive future-observability reason. |
 
 Default thresholds are provisional:
 
 - Initial: at least 1 active day and 1 evaluated element.
-- Future: at least 3 active days and 100 evaluated elements.
+- Future: at least 3 days containing evaluated performance and 100 evaluated elements.
 
 They must be frozen only after sensitivity and trajectory-reliability analysis.

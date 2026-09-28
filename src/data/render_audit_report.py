@@ -51,8 +51,10 @@ exceed their evaluated denominators.
   tabular fields ({duplicate_rate:.2f}% of all rows).
 - {events['exact_duplicate_rows']:,} also match on nested `events_data`
   ({exact_duplicate_rate:.2f}% of all rows).
-- {events['students_affected_by_duplicate_keys']:,} students have at least one
-  duplicated composite event key.
+- {events['students_affected_by_tabular_matches']:,} students have at least one
+  tabular match when nested `events_data` is ignored.
+- {events['students_affected_by_exact_raw_duplicates']:,} students have at
+  least one exact raw duplicate including `events_data`.
 - All potential duplicates are retained until source semantics establish
   whether exact raw matches are ingestion duplicates or valid repeated events.
 
@@ -74,10 +76,15 @@ exceed their evaluated denominators.
 
 - Initial eligible students: {coverage['initial_eligible_students']:,}.
 - Students with any future activity: {coverage['future_active_students']:,}.
-- Future observable students under the current configurable thresholds:
+- Future observable students among all 1,000 raw users under the current
+  configurable thresholds:
   {coverage['future_observable_students']:,} ({observable_rate:.1f}%).
 - Students meeting both initial eligibility and future observability:
   {coverage['analysis_cohort_students']:,}.
+- Reconciliation: an earlier audit produced a historical preliminary count of
+  881 because it counted any future active day. The corrected analysis cohort
+  is 880: one student has three future activity days but only two days
+  containing evaluable performance.
 - Thresholds: {coverage['observability_thresholds']}.
 - Initial eligibility reasons: {coverage['initial_eligibility_reasons']}.
 - Future observability reasons: {coverage['future_observability_reasons']}.
