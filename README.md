@@ -139,6 +139,7 @@ python -m src.data.audit_connectivity
 python -m src.data.build_modeling_table
 python -m src.models.hierarchical_measurement
 python -m src.models.dispersion_comparison
+python -m src.models.inference_validation
 ```
 
 El modelo de medición usa por defecto la ventana futura `[7, 31)`, separa

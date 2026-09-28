@@ -140,9 +140,10 @@ def evaluate_family(
         np.maximum(predictive_variance, 1e-9)
     )
     residuals = data[
-        ["user_id", "exercise_id", "day_index", "successful", "evaluated"]
+        ["user_id", "exercise_id", "day_index", "difficulty_level", "successful", "evaluated"]
     ].copy()
     residuals["predicted_probability"] = p_mean
+    residuals["predicted_successful"] = evaluated * p_mean
     residuals["observed_rate"] = successful / evaluated
     residuals["predictive_variance"] = predictive_variance
     residuals["pearson_residual"] = residual
