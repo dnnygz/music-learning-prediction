@@ -98,3 +98,19 @@ the same student–exercise–day from being collapsed.
 Exact raw duplicates remain included in the principal table. A model fitted
 after removing the 478 known later duplicate rows is reserved for sensitivity
 analysis.
+
+## `student_prediction.parquet`
+
+Grain: one row per student and response type (`note` or `chord`) for students
+with both first-week features and a future adjusted-slope estimate.
+
+- All `initial_*` and `log1p_initial_*` predictors use only events in `[0, 7)`.
+- `adjusted_trajectory_slope` and its uncertainty use `[7, 31)` and are outcomes,
+  never predictors.
+- `calibrated_slope_sd` inflates full-cohort ADVI uncertainty using the
+  response-specific median NUTS/ADVI uncertainty ratio from the fixed 25%
+  validation cohort.
+- `probability_slope_gt_0p0`, `..._0p01`, and `..._0p02` are soft targets from a
+  Normal approximation. The `0.02` threshold is provisional and must not be
+  presented as a business-approved cutoff.
+- No song/exercise frequency encoding or future-derived feature is present.

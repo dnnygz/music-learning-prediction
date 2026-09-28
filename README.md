@@ -143,6 +143,9 @@ python -m src.models.inference_validation
 python -m src.models.nonlinear_bridge
 python -m src.models.random_slope_measurement
 python -m src.models.random_slope_inference_validation
+python -m src.data.build_prediction_dataset
+python -m src.models.two_stage_prediction
+python -m src.models.joint_slope_prediction
 ```
 
 El modelo de medición usa por defecto la ventana futura `[7, 31)`, separa
