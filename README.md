@@ -80,6 +80,14 @@ Comparaciones:
 La comparación principal usará un resultado común en `[21, 31)` para evitar
 solapamiento entre predictores y resultado.
 
+Resultado:
+
+- Elegibles con 7, 14 y 21 días: 945, 980 y 996 estudiantes.
+- Cohorte común con trayectoria observable en `[21,31)`: 505 estudiantes.
+- Ninguna ventana supera el baseline constante para predecir la trayectoria.
+- Todos los modelos continuos tienen R² fuera de muestra negativo y ampliar la
+  historia a 14 o 21 días no mejora consistentemente las métricas.
+
 
 ### Experimento 3 — Predicción de desempeño inmediato
 

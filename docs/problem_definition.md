@@ -113,6 +113,24 @@ primary design will hold the outcome window fixed at `[21, 31)` so predictor and
 outcome periods never overlap. Results must also report how the longer initial
 window changes cohort eligibility and outcome prevalence.
 
+**Result:** Initial eligibility increases from 945 students at day 7 to 980 at
+day 14 and 996 at day 21. With the common `[21, 31)` trajectory-observability
+requirement, the per-window analysis cohorts contain 505, 527, and 542 students,
+respectively. The controlled intersection contains 505 students; response-specific
+targets are available for 484 students for notes and 487 for chords.
+
+On this fixed cohort and outcome window, extending the history does not improve
+trajectory prediction. Ridge and Random Forest models have negative out-of-fold
+$R^2$ for every history length and response type. Expected probabilistic log-loss
+for $P(\lambda_i > 0.02)$ is also slightly worse than the response-specific
+constant baseline in every comparison. The evidence therefore matches Case B:
+results remain similarly weak with 7, 14, and 21 days, so extending the initial
+observation window does not recover sufficient predictive signal. The failure
+cannot be explained solely by observing only seven initial days.
+The common target spans only ten elapsed days, so this conclusion is specific to
+the controlled `[21, 31)` outcome and does not cover every possible later or
+longer trajectory definition.
+
 ### Experiment 3 — immediate performance prediction
 
 Evaluate the closer-to-observation task:

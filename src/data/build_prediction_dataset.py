@@ -14,8 +14,11 @@ from scipy.special import ndtr
 UNCERTAINTY_INFLATION = {"note": 1 / 0.573788, "chord": 1 / 0.705704}
 
 
-def build_features(events: pd.DataFrame) -> pd.DataFrame:
-    initial = events.loc[events.days_since_signup.between(0, 7, inclusive="left")].copy()
+def build_features(events: pd.DataFrame, initial_end: float = 7) -> pd.DataFrame:
+    """Build student features from the half-open window ``[0, initial_end)``."""
+    initial = events.loc[
+        events.days_since_signup.between(0, initial_end, inclusive="left")
+    ].copy()
     initial["practice_mode"] = (initial.play_mode == "practice").astype(float)
     grouped = initial.groupby("user_id", observed=True)
     features = grouped.agg(
