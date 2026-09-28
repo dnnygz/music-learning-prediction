@@ -45,7 +45,10 @@ continuous slope, not the primary statistical target.
 1. `events_clean.parquet`: validated event-grain data derived from the raw JSON.
 2. `student_coverage.parquet`: one row for every raw student, including explicit
    observability status and exclusion reason.
-3. `student_prediction.parquet`: first-week student features joined to outcomes;
+3. `student_exercise_day.parquet`: binomial numerator and denominator at
+   student–exercise–day–context–response-type grain for the longitudinal
+   measurement model.
+4. `student_prediction.parquet`: first-week student features joined to outcomes;
    implemented after outcome definitions are validated.
 
 The legacy CSV is retained only as an exploratory baseline and is not the source

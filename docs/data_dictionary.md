@@ -72,3 +72,29 @@ Default thresholds are provisional:
 - Future: at least 3 days containing evaluated performance and 100 evaluated elements.
 
 They must be frozen only after sensitivity and trajectory-reliability analysis.
+
+## `student_exercise_day.parquet`
+
+Grain: one row per student, exercise, integer day, song, declared difficulty,
+play mode, song type, and response type. Although the filename is concise, the
+context columns are part of the key; this prevents different play modes within
+the same student–exercise–day from being collapsed.
+
+| Column | Definition |
+|---|---|
+| `user_id` | Student identifier and grouping unit for train/test splits. |
+| `exercise_id` | Exercise whose difficulty receives a partially pooled effect. |
+| `song_id` | Source song identifier retained as context and lineage. |
+| `day_index` | Integer elapsed day since signup; candidate global time effect. |
+| `difficulty_level` | Source-declared difficulty; not a frequency-derived feature. |
+| `play_mode` | Source play context (`play` or `practice`). |
+| `song_type` | Source content type. |
+| `response_type` | `note` or `chord`; keeps the two response processes explicit. |
+| `successful` | Sum of successful responses for this row. |
+| `evaluated` | Positive binomial denominator for this row. |
+| `source_event_rows` | Distinct raw event rows contributing to the aggregate. |
+| `success_rate` | Descriptive ratio `successful / evaluated`; not averaged from event rates. |
+
+Exact raw duplicates remain included in the principal table. A model fitted
+after removing the 478 known later duplicate rows is reserved for sensitivity
+analysis.

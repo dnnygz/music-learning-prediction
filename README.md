@@ -136,6 +136,7 @@ python -m src.data.build_student_tables
 python -m src.data.render_audit_report
 python -m src.data.audit_semantics
 python -m src.data.audit_connectivity
+python -m src.data.build_modeling_table
 ```
 
 Los umbrales de observabilidad son argumentos explícitos. Por ejemplo:

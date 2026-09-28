@@ -8,6 +8,11 @@ import pandas as pd
 
 from src.data.build_student_tables import build_student_coverage
 from src.data.clean_events import audit_events, clean_events
+from src.data.build_modeling_table import (
+    assert_modeling_table,
+    audit_modeling_table,
+    build_modeling_table,
+)
 from src.data.common import RAW_COLUMNS
 
 
@@ -90,6 +95,24 @@ class DataPipelineTests(unittest.TestCase):
 
         self.assertEqual(coverage["initial_events"], 1)
         self.assertEqual(coverage["future_events"], 1)
+
+    def test_modeling_table_separates_response_types_and_reconciles(self) -> None:
+        first = raw_event("u1", 1.2, evaluated=10)
+        first["chords_evaluated"] = 4
+        first["chords_successful"] = 3
+        second = raw_event("u1", 1.8, evaluated=5)
+        second["notes_successful"] = 4
+        events = clean_events(pd.DataFrame.from_records([first, second], columns=RAW_COLUMNS))
+
+        table = build_modeling_table(events)
+        audit = audit_modeling_table(events, table)
+        assert_modeling_table(audit)
+
+        notes = table.loc[table["response_type"] == "note"].iloc[0]
+        chords = table.loc[table["response_type"] == "chord"].iloc[0]
+        self.assertEqual((notes["successful"], notes["evaluated"]), (13, 15))
+        self.assertEqual((chords["successful"], chords["evaluated"]), (3, 4))
+        self.assertEqual(audit["duplicate_grain_keys"], 0)
 
 
 if __name__ == "__main__":
