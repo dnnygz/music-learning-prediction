@@ -95,15 +95,17 @@ validation showed that ADVI understates slope uncertainty.
 ## Decision
 None of the evaluated formulations demonstrated reliable out-of-sample predictive capability for individual future adjusted trajectories using only behavioral signals recorded during the first seven elapsed days.
 
-The three approaches addressed the same prediction problem under different assumptions:
+The three approaches addressed the same trajectory prediction problem under different assumptions:
 
 1. A two-stage approach predicting the estimated individual trajectory.
 2. A probabilistic formulation predicting the probability of a relevant positive trajectory.
 3. A joint hierarchical model incorporating early behavioral features directly into the latent trajectory estimation process.
 
-Across all formulations, improvements over simple baselines were negligible or inconsistent. The joint hierarchical model, despite providing a statistically integrated treatment of the latent trajectory and measurement process, did not produce a consistent improvement in held-out predictive performance.
+Across all formulations, improvements over simple baselines were negligible or inconsistent. The joint hierarchical model, despite providing a statistically integrated treatment of the latent trajectory and measurement process, did not recover additional predictive signal from the available first-week features.
 
-These results suggest that the limiting factor is not model complexity, but the amount of predictive information contained in the first seven days of platform activity. Early behavioral signals capture aspects of initial engagement and observed performance; however, they are insufficient to reliably determine individual future performance trajectories after controlling for exercise difficulty, content composition, and measurement uncertainty.
+These results suggest that the limiting factor is not model complexity, but the amount of predictive information contained in the first seven days of platform activity regarding individual learning dynamics.
+
+Early behavioral signals capture aspects of initial engagement and observed performance; however, after controlling for exercise difficulty, content composition, and measurement uncertainty, they are insufficient to reliably determine individual future performance trajectories.
 
 Possible explanations include:
 
@@ -111,8 +113,23 @@ Possible explanations include:
 - Seven days may provide insufficient observations to estimate stable individual learning dynamics.
 - Future practice behavior may introduce changes that cannot be inferred from the initial observation period alone.
 
-Therefore, the project does not support claiming successful early prediction of individual learning trajectories with the available data. Instead, the results provide evidence about the limits of early behavioral prediction under this dataset and formulation.
+## Future observability analysis
 
-A complementary analysis should evaluate whether first-week signals are more informative for predicting future observability or retention, since continuity-related outcomes may contain stronger behavioral signals than long-term individual performance trajectories.
+Although early trajectory prediction was not successful, the same first-week behavioral signals showed predictive value for future observability.
 
-Future improvements would require either additional information sources, a revised prediction horizon or alternative targets that better match the observable behavior captured by the platform.
+The complementary prediction problem was defined as:
+
+$$X_{[0,7)} \rightarrow FutureObservable$$
+
+where future observability represents whether the platform collects sufficient future evaluated activity to estimate subsequent performance.
+
+Classification models substantially outperformed the prevalence baseline, indicating that early behavioral signals contain information about continued measurable engagement.
+
+This suggests an important distinction:
+
+- Early behavioral signals are informative about whether a student will remain sufficiently observable on the platform.
+- The same signals are not sufficient to reliably predict individual learning trajectories after accounting for content difficulty and measurement uncertainty.
+
+Therefore, the evidence supports early prediction of future observability, but not early prediction of individual learning dynamics under the current dataset and formulation.
+
+Future improvements would require additional information sources, a revised prediction horizon, alternative targets, or richer behavioral signals that better capture the mechanisms underlying individual learning trajectories.
