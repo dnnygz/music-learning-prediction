@@ -142,6 +142,7 @@ python -m src.models.dispersion_comparison
 python -m src.models.inference_validation
 python -m src.models.nonlinear_bridge
 python -m src.models.random_slope_measurement
+python -m src.models.random_slope_inference_validation
 ```
 
 El modelo de medición usa por defecto la ventana futura `[7, 31)`, separa
