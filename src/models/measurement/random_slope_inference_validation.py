@@ -14,11 +14,11 @@ import pandas as pd
 import pymc as pm
 from scipy.stats import spearmanr
 
-from src.models.hierarchical_measurement import (
+from src.models.measurement.hierarchical_measurement import (
     RANDOM_SEED, posterior_summary, prepare_data, standardize,
 )
-from src.models.inference_validation import select_users
-from src.models.random_slope_measurement import FORMULAS, model_priors
+from src.models.measurement.inference_validation import select_users
+from src.models.measurement.random_slope_measurement import FORMULAS, model_priors
 
 
 SCALAR_PARAMETERS = [
@@ -147,7 +147,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=Path("data/processed/student_exercise_day.parquet"))
     parser.add_argument("--output-dir", type=Path, default=Path("data/model_outputs/random_slope_inference_v1"))
-    parser.add_argument("--report", type=Path, default=Path("reports/random_slope_inference_v1.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/measurement/random_slope_inference_v1.md"))
     parser.add_argument("--user-fraction", type=float, default=0.25)
     parser.add_argument("--advi-iterations", type=int, default=20000)
     parser.add_argument("--advi-draws", type=int, default=1000)

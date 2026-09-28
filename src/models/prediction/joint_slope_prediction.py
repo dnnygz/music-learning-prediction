@@ -14,9 +14,9 @@ import pandas as pd
 import pymc as pm
 from scipy.special import expit, logsumexp
 
-from src.models.dispersion_comparison import logpmf
-from src.models.hierarchical_measurement import RANDOM_SEED, FitResult, prepare_data, split_users, values
-from src.models.random_slope_measurement import model_priors
+from src.models.measurement.dispersion_comparison import logpmf
+from src.models.measurement.hierarchical_measurement import RANDOM_SEED, FitResult, prepare_data, split_users, values
+from src.models.measurement.random_slope_measurement import model_priors
 
 
 EARLY_FEATURES = [

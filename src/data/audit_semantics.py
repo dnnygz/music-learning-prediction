@@ -293,7 +293,7 @@ def parse_args() -> argparse.Namespace:
         default=Path("data/interim/threshold_sensitivity.parquet"),
     )
     parser.add_argument("--audit-output", type=Path, default=Path("data/interim/semantics_audit.json"))
-    parser.add_argument("--report-output", type=Path, default=Path("reports/semantics_audit.md"))
+    parser.add_argument("--report-output", type=Path, default=Path("reports/data_quality/semantics_audit.md"))
     return parser.parse_args()
 
 

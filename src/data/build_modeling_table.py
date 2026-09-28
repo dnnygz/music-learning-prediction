@@ -193,7 +193,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--events", type=Path, default=Path("data/interim/events_clean.parquet"))
     parser.add_argument("--output", type=Path, default=Path("data/processed/student_exercise_day.parquet"))
     parser.add_argument("--audit-output", type=Path, default=Path("data/interim/modeling_table_audit.json"))
-    parser.add_argument("--report-output", type=Path, default=Path("reports/modeling_table_audit.md"))
+    parser.add_argument("--report-output", type=Path, default=Path("reports/data_quality/modeling_table_audit.md"))
     return parser.parse_args()
 
 

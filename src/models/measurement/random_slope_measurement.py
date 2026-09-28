@@ -15,8 +15,8 @@ import pymc as pm
 from scipy.special import expit, logsumexp
 from scipy.stats import spearmanr
 
-from src.models.dispersion_comparison import conditional_calibration, logpmf
-from src.models.hierarchical_measurement import (
+from src.models.measurement.dispersion_comparison import conditional_calibration, logpmf
+from src.models.measurement.hierarchical_measurement import (
     RANDOM_SEED, FitResult, posterior_summary, prepare_data, split_users,
     standardize, values,
 )
@@ -286,7 +286,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=Path("data/processed/student_exercise_day.parquet"))
     parser.add_argument("--output-dir", type=Path, default=Path("data/model_outputs/random_slope_v1"))
-    parser.add_argument("--report", type=Path, default=Path("reports/random_slope_v1.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/measurement/random_slope_v1.md"))
     parser.add_argument("--vi-iterations", type=int, default=20000)
     parser.add_argument("--posterior-draws", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=RANDOM_SEED)

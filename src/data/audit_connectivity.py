@@ -187,7 +187,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--exercise-output", type=Path, default=Path("data/interim/exercise_connectivity.parquet"))
     parser.add_argument("--student-output", type=Path, default=Path("data/interim/student_connectivity.parquet"))
     parser.add_argument("--audit-output", type=Path, default=Path("data/interim/connectivity_audit.json"))
-    parser.add_argument("--report-output", type=Path, default=Path("reports/connectivity_audit.md"))
+    parser.add_argument("--report-output", type=Path, default=Path("reports/data_quality/connectivity_audit.md"))
     return parser.parse_args()
 
 

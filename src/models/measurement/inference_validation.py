@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import pymc as pm
 
-from src.models.hierarchical_measurement import (
+from src.models.measurement.hierarchical_measurement import (
     RANDOM_SEED, formula_for, posterior_summary, prepare_data, priors_for, standardize,
 )
 
@@ -86,7 +86,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=Path("data/processed/student_exercise_day.parquet"))
     parser.add_argument("--output-dir", type=Path, default=Path("data/model_outputs/inference_validation_v1"))
-    parser.add_argument("--report", type=Path, default=Path("reports/inference_validation_v1.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/measurement/inference_validation_v1.md"))
     parser.add_argument("--user-fraction", type=float, default=0.25)
     parser.add_argument("--advi-iterations", type=int, default=20000)
     parser.add_argument("--advi-draws", type=int, default=1000)

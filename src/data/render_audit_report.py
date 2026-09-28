@@ -14,7 +14,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--coverage-audit", type=Path, default=Path("data/interim/student_coverage_audit.json")
     )
-    parser.add_argument("--output", type=Path, default=Path("reports/data_quality_report.md"))
+    parser.add_argument("--output", type=Path, default=Path("reports/data_quality/data_quality_report.md"))
     return parser.parse_args()
 
 

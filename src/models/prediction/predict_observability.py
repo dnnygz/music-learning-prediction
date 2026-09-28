@@ -22,7 +22,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from src.data.build_prediction_dataset import build_features
-from src.models.two_stage_prediction import FEATURES
+from src.models.prediction.two_stage_prediction import FEATURES
 
 
 def evaluate(y: np.ndarray, probability: np.ndarray) -> dict[str, float]:

@@ -15,7 +15,7 @@ import pandas as pd
 import pymc as pm
 from scipy.special import betaln, gammaln, logsumexp
 
-from src.models.hierarchical_measurement import (
+from src.models.measurement.hierarchical_measurement import (
     RANDOM_SEED,
     FitResult,
     formula_for,
@@ -291,7 +291,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=Path("data/processed/student_exercise_day.parquet"))
     parser.add_argument("--output-dir", type=Path, default=Path("data/model_outputs/dispersion_v1"))
-    parser.add_argument("--report", type=Path, default=Path("reports/dispersion_comparison_v1.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/measurement/dispersion_comparison_v1.md"))
     parser.add_argument("--day-start", type=int, default=7)
     parser.add_argument("--day-end", type=int, default=31)
     parser.add_argument("--test-fraction", type=float, default=0.2)

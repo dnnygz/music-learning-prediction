@@ -439,7 +439,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=Path("data/processed/student_exercise_day.parquet"))
     parser.add_argument("--output-dir", type=Path, default=Path("data/model_outputs/hierarchical_v1"))
-    parser.add_argument("--report", type=Path, default=Path("reports/hierarchical_measurement_v1.md"))
+    parser.add_argument("--report", type=Path, default=Path("reports/measurement/hierarchical_measurement_v1.md"))
     parser.add_argument("--day-start", type=int, default=7)
     parser.add_argument("--day-end", type=int, default=31)
     parser.add_argument("--test-fraction", type=float, default=0.2)

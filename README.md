@@ -1,162 +1,132 @@
-# Music Learning Prediction - Yousician Open Dataset
-
-Proyecto de Machine Learning para predecir si un estudiante de música mejorará su desempeño a partir de sus primeras sesiones de práctica en la plataforma Yousician.
-
 ## Problema
 
-El problema que buscamos resolver es **predecir si un estudiante de música logrará mejorar su desempeño durante su proceso de aprendizaje utilizando únicamente la información obtenida durante sus primeras sesiones de práctica**.
+Este proyecto investiga si las señales conductuales registradas durante los primeros días de práctica en una plataforma de aprendizaje musical permiten anticipar resultados futuros del estudiante.
 
-Actualmente, las plataformas de aprendizaje musical registran una gran cantidad de interacciones, pero identificar tempranamente qué estudiantes están progresando y cuáles podrían necesitar apoyo adicional resulta difícil. Por ello, el objetivo es construir un modelo de clasificación que permita predecir la variable **`Performance_Improvement`** (mejora futura del estudiante), analizando factores iniciales como frecuencia de práctica, tiempo dedicado, precisión en notas y acordes, dificultad de los ejercicios, nivel de participación y comportamiento durante las sesiones.
+La pregunta principal es:
 
-De esta manera, una plataforma de aprendizaje musical podría detectar estudiantes con riesgo de estancamiento y recomendar estrategias de aprendizaje más personalizadas para mejorar su progreso musical.
+Can behavioral signals recorded during a student's first seven elapsed days predict future observability and, among observable students, the subsequent trajectory of platform-recorded performance?
 
-## Fuente de datos
-
-El proyecto utiliza el **Yousician Open Dataset**, disponible en:
-
-[https://yousician.com/open-data](https://yousician.com/open-data)
-
-El dataset contiene registros de interacciones de estudiantes dentro de una plataforma de aprendizaje musical. Cada registro representa una actividad realizada por un usuario durante la práctica de una canción o ejercicio.
+Debido a que el desempeño observado depende de la dificultad del contenido y del contexto de práctica, primero se construye una medida ajustada de trayectoria mediante modelos jerárquicos probabilísticos antes de evaluar modelos predictivos.
 
 ## Metodología
 
-El trabajo sigue la metodología **CRISP-DM**:
+El proyecto se divide en dos etapas:
 
-1. **Business Understanding:** definición del problema predictivo y su utilidad para plataformas de aprendizaje musical.
-2. **Data Understanding:** exploración inicial del dataset, variables disponibles, usuarios únicos, actividad por estudiante, evolución temporal, duplicados, valores nulos y métricas de desempeño.
-3. **Data Preparation:** transformación del dataset desde nivel interacción hacia nivel estudiante, creación de variables agregadas iniciales y construcción de la variable objetivo.
-4. **Modeling:** entrenamiento de modelos de clasificación para predecir `Performance_Improvement`.
-5. **Evaluation:** evaluación del desempeño predictivo del modelo.
-6. **Deployment:** propuesta de uso del modelo para identificar estudiantes que podrían necesitar apoyo adicional.
+### 1. Estimación de desempeño y trayectoria
 
-## Variable objetivo
+Los eventos originales se transforman en observaciones estudiante-ejercicio-contexto.
 
-La variable objetivo es:
+Se utiliza un modelo jerárquico beta-binomial:
 
-```text
-Performance_Improvement
-```
+Y ~ BetaBinomial(N,p)
 
-Se construye comparando el desempeño inicial del estudiante contra su desempeño posterior:
+considerando:
 
-- **Periodo inicial:** primeros 7 días de actividad.
-- **Periodo posterior:** días 15 a 30.
-- `Performance_Improvement = 1` si la precisión promedio posterior es mayor que la precisión promedio inicial.
-- `Performance_Improvement = 0` si el estudiante no mejora.
+- dificultad del ejercicio;
+- efecto del ejercicio;
+- diferencias individuales;
+- evolución temporal.
 
-Esta separación temporal evita fuga de información, ya que las variables predictoras se crean únicamente con información de las primeras sesiones.
+Esto permite estimar una trayectoria latente individual:
 
-## Variables generadas
+λ_i
 
-El dataset procesado se encuentra a nivel estudiante e incluye:
+que representa el cambio ajustado del desempeño durante el periodo futuro.
 
-- `user_id`
-- `total_days_active_initial`
-- `number_of_sessions_initial`
-- `total_time_playing_initial`
-- `average_time_per_session_initial`
-- `total_exercises_initial`
-- `average_note_accuracy_initial`
-- `average_chord_accuracy_initial`
-- `average_difficulty_initial`
-- `completion_rate_initial`
-- `abandonment_rate_initial`
-- `average_session_index_initial`
-- `songs_practiced_initial`
-- `exercises_practiced_initial`
-- `play_mode_frequency_initial`
-- `Performance_Improvement`
+### 2. Evaluación predictiva
 
-Las variables identificadoras `song_id` y `exercise_id` no se utilizan directamente como predictores. Solo se conserva `user_id` como identificador.
+Se evalúa si las variables disponibles durante los primeros siete días permiten predecir:
+
+1. Future observability
+
+X_0-7 → FutureObservable
+
+
+2. Future trajectory
+
+X_0-7 → λ_i
+
+## Experimentos
+
+### Experimento 1 — Future observability
+
+Objetivo:
+Determinar si las señales tempranas permiten anticipar si un estudiante tendrá suficiente actividad futura para estimar una trayectoria.
+
+Modelo:
+
+X_0-7 → FutureObservable
+
+
+### Experimento 2 — Sensibilidad temporal
+
+Objetivo:
+Evaluar si extender la ventana inicial mejora la capacidad predictiva.
+
+Comparaciones:
+
+- primeros 7 días;
+- primeros 14 días;
+- primeros 21 días.
+
+
+### Experimento 3 — Predicción de desempeño inmediato
+
+Objetivo:
+Evaluar un problema alternativo donde la etiqueta es más cercana a la observación.
+
+Modelo:
+
+(student, exercise, context) → P(success)
+
+Este experimento utiliza directamente el modelo beta-binomial de desempeño.
 
 ## Estructura del proyecto
 
 ```text
-.
-├── data/
-│   ├── raw/
-│   │   └── yousician_ukulele.json
-│   └── processed/
-│       └── yousician_processed.csv
-├── notebooks/
-│   └── 01_data_understanding_yousician.ipynb
-├── scripts/
-│   └── process_yousician.py
-├── requirements.txt
-└── README.md
+src/
+├── data/                  # Ingesta, limpieza, tablas analíticas y auditorías
+├── analysis/              # Análisis exploratorios y de estabilidad
+├── models/
+│   ├── measurement/       # Medición jerárquica de desempeño y trayectoria
+│   └── prediction/        # Modelos predictivos a nivel estudiante
+└── evaluation/            # Reservado para métricas y validaciones compartidas
+
+reports/
+├── data_quality/          # Calidad, semántica, conectividad y tabla de modelado
+├── measurement/           # Resultados de modelos jerárquicos y de inferencia
+├── prediction/            # Resultados de los experimentos predictivos
+└── summary/               # Síntesis globales del proyecto
+
+data/
+├── raw/                   # Dataset original inmutable
+├── interim/               # Artefactos intermedios
+├── processed/             # Datasets finales para modelado
+└── model_outputs/         # Parámetros, predicciones y diagnósticos generados
 ```
 
-## Reproducibilidad
+## Ejecución
 
-Crear y activar un entorno virtual:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-Instalar dependencias:
-
-```bash
-pip install -r requirements.txt
-```
-
-Generar el dataset procesado:
-
-```bash
-python scripts/process_yousician.py
-```
-
-El archivo resultante se exporta a:
-
-```text
-data/processed/yousician_processed.csv
-```
-
-## Estado actual
-
-- Se creó el notebook de **Data Understanding**.
-- Se identificó que el dataset original está a nivel interacción, no a nivel estudiante.
-- Se detectaron duplicados aparentes y métricas indefinidas cuando no existen notas o acordes evaluados.
-- Se creó un script para transformar los datos a nivel estudiante.
-- Se generó el dataset procesado `yousician_processed.csv`.
-
-## Pipeline rediseñado
-
-El CSV anterior se conserva como baseline exploratorio. La fuente de verdad del
-nuevo pipeline es el JSON de eventos y la unidad independiente de evaluación es
-el estudiante. La definición completa está en
-[`docs/problem_definition.md`](docs/problem_definition.md).
-
-Generar y auditar la capa de datos:
+Los módulos deben ejecutarse desde la raíz del repositorio. Ejemplos:
 
 ```bash
 python -m src.data.clean_events
 python -m src.data.build_student_tables
-python -m src.data.render_audit_report
 python -m src.data.audit_semantics
 python -m src.data.audit_connectivity
 python -m src.data.build_modeling_table
-python -m src.models.hierarchical_measurement
-python -m src.models.dispersion_comparison
-python -m src.models.inference_validation
-python -m src.models.nonlinear_bridge
-python -m src.models.random_slope_measurement
-python -m src.models.random_slope_inference_validation
-python -m src.data.build_prediction_dataset
-python -m src.models.two_stage_prediction
-python -m src.models.joint_slope_prediction
+
+python -m src.models.measurement.hierarchical_measurement
+python -m src.models.measurement.dispersion_comparison
+python -m src.models.measurement.inference_validation
+python -m src.models.measurement.nonlinear_bridge
+python -m src.models.measurement.random_slope_measurement
+python -m src.models.measurement.random_slope_inference_validation
+
+python -m src.models.prediction.two_stage_prediction
+python -m src.models.prediction.joint_slope_prediction
+python -m src.models.prediction.predict_observability
 ```
 
-El modelo de medición usa por defecto la ventana futura `[7, 31)`, separa
-notas y acordes, reserva usuarios completos para evaluación y ajusta los cinco
-modelos incrementales mediante Bambi + PyMC. La primera versión usa ADVI para
-hacer viable la comparación completa; sus intervalos son aproximados.
-
-Los umbrales de observabilidad son argumentos explícitos. Por ejemplo:
-
-```bash
-python -m src.data.build_student_tables \
-  --min-future-evaluated-days 3 \
-  --min-future-evaluated 100
-```
+Los artefactos numéricos continúan almacenándose en `data/model_outputs/`; la
+reorganización solo cambia la ubicación del código y de los reportes Markdown.
