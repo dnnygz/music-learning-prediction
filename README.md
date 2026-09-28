@@ -137,7 +137,14 @@ python -m src.data.render_audit_report
 python -m src.data.audit_semantics
 python -m src.data.audit_connectivity
 python -m src.data.build_modeling_table
+python -m src.models.hierarchical_measurement
+python -m src.models.dispersion_comparison
 ```
+
+El modelo de medición usa por defecto la ventana futura `[7, 31)`, separa
+notas y acordes, reserva usuarios completos para evaluación y ajusta los cinco
+modelos incrementales mediante Bambi + PyMC. La primera versión usa ADVI para
+hacer viable la comparación completa; sus intervalos son aproximados.
 
 Los umbrales de observabilidad son argumentos explícitos. Por ejemplo:
 
