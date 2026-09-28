@@ -121,6 +121,37 @@ data/processed/yousician_processed.csv
 - Se creó un script para transformar los datos a nivel estudiante.
 - Se generó el dataset procesado `yousician_processed.csv`.
 
+## Pipeline rediseñado
+
+El CSV anterior se conserva como baseline exploratorio. La fuente de verdad del
+nuevo pipeline es el JSON de eventos y la unidad independiente de evaluación es
+el estudiante. La definición completa está en
+[`docs/problem_definition.md`](docs/problem_definition.md).
+
+Generar y auditar la capa de datos:
+
+```bash
+python -m src.data.clean_events
+python -m src.data.build_student_tables
+python -m src.data.render_audit_report
+```
+
+Los umbrales de observabilidad son argumentos explícitos. Por ejemplo:
+
+```bash
+python -m src.data.build_student_tables \
+  --min-future-active-days 3 \
+  --min-future-evaluated 100
+```
+
+Artefactos generados:
+
+- `data/interim/events_clean.parquet`
+- `data/interim/student_coverage.parquet`
+- `data/interim/events_audit.json`
+- `data/interim/student_coverage_audit.json`
+- `reports/data_quality_report.md`
+
 ## Limitaciones identificadas
 
 - El dataset original contiene múltiples registros por usuario.
