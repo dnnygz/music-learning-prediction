@@ -7,6 +7,17 @@ Can behavioral signals recorded during a student's first seven elapsed days pred
 This project measures behavior and performance inside the platform. It does not
 claim to measure general musical learning outside the observed activities.
 
+The question contains two related but distinct predictive tasks:
+
+1. $X_{[0,7)} \rightarrow FutureObservable$ for all initially eligible students.
+2. $X_{[0,7)} \rightarrow \lambda_i$ among students whose future performance
+   trajectory can be estimated.
+
+The first task asks whether the student will remain measurable in the platform.
+The second asks whether early behavior predicts the direction or magnitude of a
+later content-adjusted performance trajectory. Success in one task does not imply
+success in the other.
+
 ## Units of analysis
 
 - **Event:** one recorded interaction between a student and the platform.
@@ -31,14 +42,89 @@ definition.
 ## Outcomes
 
 1. **Future observability:** whether enough future evidence exists to estimate
-   a longitudinal trajectory. The required number of active days and evaluated
-   elements are explicit pipeline parameters.
+   a longitudinal trajectory. In the primary operational definition,
+   `FutureObservable = 1` requires at least three future days with evaluated
+   performance and at least 100 evaluated elements during `[7, 31)`.
 2. **Future adjusted trajectory:** a continuous, partially pooled slope of
-   performance during the future window, adjusted for content difficulty and
-   context. This outcome will be implemented after the data layer and baseline.
+   platform-recorded performance during `[7, 31)`, adjusted for content
+   difficulty, exercise, response type, and measurement uncertainty.
+
+Future observability is an operational data-coverage outcome, not an intrinsic
+property of the student. It can change if the minimum number of days, evaluated
+elements, or future window changes. A suitable methods statement is:
+
+> Future observability was operationalized as the availability of sufficient
+> future evaluated interactions to estimate subsequent performance dynamics.
 
 Positive/stable/negative trajectory labels are operational translations of the
 continuous slope, not the primary statistical target.
+
+## Results for the original question
+
+### Future observability
+
+The initial cohort contains 945 students: 880 are future observable and 65 are
+not observable under the primary definition. Models were evaluated with
+five-fold stratified out-of-fold predictions using only features from `[0, 7)`.
+Future non-observability is treated as the positive class because it is the rare
+operational case.
+
+| Model | ROC-AUC | 95% bootstrap CI | Average precision | 95% bootstrap CI | Brier | Recall at 0.5 |
+|---|---:|---:|---:|---:|---:|---:|
+| Prevalence baseline | 0.500 | [0.500, 0.500] | 0.069 | [0.069, 0.069] | 0.064 | 0.000 |
+| Balanced logistic regression | **0.841** | **[0.787, 0.886]** | **0.305** | **[0.234, 0.418]** | 0.154 | **0.769** |
+| Balanced random forest | 0.831 | [0.769, 0.881] | 0.302 | [0.232, 0.418] | 0.075 | 0.462 |
+
+The early signals therefore contain useful information for ranking students by
+risk of future non-observability. The balanced logistic probabilities are not
+well calibrated: class weighting improves minority recall but produces worse
+Brier score and log-loss than the prevalence baseline. The supported conclusion
+is predictive discrimination, not deployment-ready probability estimation.
+
+### Future adjusted trajectory
+
+The future trajectory was evaluated with three formulations: probability of a
+relevant positive slope, continuous slope prediction with propagated target
+uncertainty, and a joint hierarchical model. Improvements over constant or
+random-slope baselines were negligible or inconsistent. First-week behavioral
+signals did not demonstrate reliable out-of-sample prediction of individual
+future adjusted trajectories under the current dataset and specifications.
+
+### Answer
+
+The original question has an asymmetric answer:
+
+> Behavioral signals recorded during the first seven elapsed days predict
+> future observability better than a prevalence-only baseline. Among observable
+> students, the same signals do not reliably predict the subsequent adjusted
+> trajectory of platform-recorded performance.
+
+This does not invalidate the hierarchical measurement model. It distinguishes
+predicting whether sufficient future evidence will exist from predicting the
+latent dynamics estimated from that evidence.
+
+## Next experiments
+
+### Experiment 2 — temporal sensitivity
+
+Evaluate whether additional initial history changes the conclusions by comparing
+features from `[0, 7)`, `[0, 14)`, and `[0, 21)`. For a fair comparison, the
+primary design will hold the outcome window fixed at `[21, 31)` so predictor and
+outcome periods never overlap. Results must also report how the longer initial
+window changes cohort eligibility and outcome prevalence.
+
+### Experiment 3 — immediate performance prediction
+
+Evaluate the closer-to-observation task:
+
+$$
+(student, exercise, difficulty, context) \rightarrow P(success)
+$$
+
+This experiment will reuse the beta-binomial performance specification while
+using temporal or group-aware holdouts. It will distinguish prediction for known
+students and exercises from cold-start evaluation; random event splitting is not
+valid because it would leak student and exercise information.
 
 ## Data layers
 
@@ -48,8 +134,15 @@ continuous slope, not the primary statistical target.
 3. `student_exercise_day.parquet`: binomial numerator and denominator at
    student–exercise–day–context–response-type grain for the longitudinal
    measurement model.
-4. `student_prediction.parquet`: first-week student features joined to outcomes;
-   implemented after outcome definitions are validated.
+4. `student_prediction.parquet`: first-week student features joined to estimated
+   trajectory outcomes and their calibrated uncertainty.
 
 The legacy CSV is retained only as an exploratory baseline and is not the source
 of truth for the redesigned pipeline.
+
+## Evidence and reproducibility
+
+- Observability implementation: `src/models/prediction/predict_observability.py`.
+- Observability report: `reports/prediction/observability_v1.md`.
+- Observability artifacts: `data/model_outputs/observability_v1/`.
+- Trajectory comparison: `reports/prediction/predictive_formulations_v1.md`.

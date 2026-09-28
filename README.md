@@ -57,6 +57,14 @@ Modelo:
 
 X_0-7 → FutureObservable
 
+Resultado:
+
+- 945 estudiantes inicialmente elegibles: 880 observables y 65 no observables.
+- Regresión logística balanceada: ROC-AUC 0.841 e average precision 0.305.
+- Random Forest balanceado: ROC-AUC 0.831 e average precision 0.302.
+- Las señales tempranas permiten ordenar el riesgo de no observabilidad, pero
+  las probabilidades todavía requieren calibración y un umbral operacional.
+
 
 ### Experimento 2 — Sensibilidad temporal
 
@@ -69,6 +77,9 @@ Comparaciones:
 - primeros 14 días;
 - primeros 21 días.
 
+La comparación principal usará un resultado común en `[21, 31)` para evitar
+solapamiento entre predictores y resultado.
+
 
 ### Experimento 3 — Predicción de desempeño inmediato
 
@@ -80,6 +91,19 @@ Modelo:
 (student, exercise, context) → P(success)
 
 Este experimento utiliza directamente el modelo beta-binomial de desempeño.
+
+## Resultado de la pregunta principal
+
+La evidencia actual produce una conclusión asimétrica:
+
+> Las señales de los primeros siete días predicen la observabilidad futura mejor
+> que un baseline de prevalencia, pero no predicen de forma confiable la
+> trayectoria individual posterior de desempeño ajustado.
+
+La definición completa, métricas, limitaciones y próximos experimentos están en
+[`docs/problem_definition.md`](docs/problem_definition.md). El reporte específico
+de observabilidad está en
+[`reports/prediction/observability_v1.md`](reports/prediction/observability_v1.md).
 
 ## Estructura del proyecto
 
