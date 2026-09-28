@@ -78,12 +78,14 @@ def standardize(train: pd.DataFrame, other: pd.DataFrame) -> tuple[pd.DataFrame,
     train, other = train.copy(), other.copy()
     values: dict[str, float] = {}
     for source, target in (("difficulty_level", "difficulty_z"), ("day_index", "day_z")):
-        mean = float(train[source].mean())
-        std = float(train[source].std(ddof=0))
+        train_source = train[source].astype("float64")
+        other_source = other[source].astype("float64")
+        mean = float(train_source.mean())
+        std = float(train_source.std(ddof=0))
         if not np.isfinite(std) or std == 0:
             std = 1.0
-        train[target] = (train[source] - mean) / std
-        other[target] = (other[source] - mean) / std
+        train[target] = ((train_source - mean) / std).astype("float64")
+        other[target] = ((other_source - mean) / std).astype("float64")
         values[f"{source}_mean"] = mean
         values[f"{source}_std"] = std
     return train, other, values
