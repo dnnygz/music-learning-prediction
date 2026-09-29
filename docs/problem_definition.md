@@ -158,6 +158,23 @@ The primary evidence covers known students and known exercises. Cold-start
 results remain descriptive because the holdout contains only four new students
 and 142 rows involving unseen exercises.
 
+### Experiment 4 — lagged exposure association
+
+M0 models temporal progression with student and exercise intercepts, declared
+difficulty, a population time effect, and student-specific time slopes. M1 adds
+only prior-day evaluated exposure, decomposed into the student's training-period
+mean and the daily deviation from that mean.
+
+Both exposure coefficients are positive with approximate ADVI intervals excluding
+zero in `[0, 21)`. Nevertheless, M1 performs worse than M0 on rolling-origin
+`[21, 31)` and frozen day-21 evaluations. It worsens LPD, log-loss, and temporal
+calibration for notes and chords, systematically overpredicting future success.
+The observed training-period association is therefore not treated as a stable
+out-of-sample association, and no exposure-by-time interaction is justified.
+
+This experiment is explicitly associational. It does not estimate the causal
+effect of additional practice on performance or learning.
+
 ## Data layers
 
 1. `events_clean.parquet`: validated event-grain data derived from the raw JSON.
@@ -180,3 +197,4 @@ of truth for the redesigned pipeline.
 - Trajectory comparison: `reports/prediction/predictive_formulations_v1.md`.
 - Temporal sensitivity: `reports/prediction/temporal_sensitivity_v1.md`.
 - Immediate performance: `reports/prediction/immediate_performance_v1.md`.
+- Lagged exposure: `reports/measurement/longitudinal_exposure_v1.md`.

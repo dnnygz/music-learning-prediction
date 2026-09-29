@@ -112,6 +112,22 @@ Resultado:
 El detalle de la evaluación está en
 [`reports/prediction/immediate_performance_v1.md`](reports/prediction/immediate_performance_v1.md).
 
+### Experimento 4 — Exposición previa y evolución longitudinal
+
+Se comparan únicamente:
+
+- M0: dificultad, tiempo, estudiante, ejercicio y pendiente temporal individual.
+- M1: M0 más exposición del día anterior, separada en componentes entre y dentro
+  del estudiante.
+
+Los coeficientes de exposición son positivos dentro del entrenamiento, pero M1
+empeora LPD, log-loss y calibración fuera de muestra en rolling-origin y frozen
+day-21. Por ello no se interpreta como una asociación predictiva estable ni se
+avanza todavía a `exposure × time`.
+
+Reporte:
+[`reports/measurement/longitudinal_exposure_v1.md`](reports/measurement/longitudinal_exposure_v1.md).
+
 ## Resultado de la pregunta principal
 
 La evidencia actual produce una conclusión asimétrica:
