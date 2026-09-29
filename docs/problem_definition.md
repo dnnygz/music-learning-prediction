@@ -144,6 +144,20 @@ using temporal or group-aware holdouts. It will distinguish prediction for known
 students and exercises from cold-start evaluation; random event splitting is not
 valid because it would leak student and exercise information.
 
+**Result:** A temporal holdout trained on `[0, 21)` and evaluated on `[21, 31)`
+shows that the hierarchical beta-binomial structure improves immediate success
+prediction over a global-rate baseline. The basic hierarchical model reduces
+log-loss from 0.4780 to 0.4575 for notes and from 0.4549 to 0.4375 for chords;
+Brier score decreases from 0.1504 to 0.1447 and from 0.1407 to 0.1365,
+respectively. Adding practice mode and song type improves beta-binomial LPD and
+residual dispersion but does not improve element-level log-loss or Brier score.
+The simpler hierarchical specification is therefore preferred for predicting
+the mean probability of immediate success.
+
+The primary evidence covers known students and known exercises. Cold-start
+results remain descriptive because the holdout contains only four new students
+and 142 rows involving unseen exercises.
+
 ## Data layers
 
 1. `events_clean.parquet`: validated event-grain data derived from the raw JSON.
@@ -164,3 +178,5 @@ of truth for the redesigned pipeline.
 - Observability report: `reports/prediction/observability_v1.md`.
 - Observability artifacts: `data/model_outputs/observability_v1/`.
 - Trajectory comparison: `reports/prediction/predictive_formulations_v1.md`.
+- Temporal sensitivity: `reports/prediction/temporal_sensitivity_v1.md`.
+- Immediate performance: `reports/prediction/immediate_performance_v1.md`.

@@ -100,6 +100,18 @@ Modelo:
 
 Este experimento utiliza directamente el modelo beta-binomial de desempeño.
 
+Resultado:
+
+- El beta-binomial jerárquico básico supera al promedio global en log-loss y
+  Brier score para notas y acordes en el holdout temporal `[21,31)`.
+- Log-loss: 0.4780 → 0.4575 para notas y 0.4549 → 0.4375 para acordes.
+- Añadir modo de práctica y tipo de canción mejora el ajuste distribucional, pero
+  no mejora la predicción de la probabilidad media fuera de muestra.
+- El resultado describe desempeño inmediato esperado, no aprendizaje ni mejora.
+
+El detalle de la evaluación está en
+[`reports/prediction/immediate_performance_v1.md`](reports/prediction/immediate_performance_v1.md).
+
 ## Resultado de la pregunta principal
 
 La evidencia actual produce una conclusión asimétrica:
